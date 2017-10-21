@@ -1,1 +1,2 @@
-This is a test file. 
+Firmware for ESC's https://github.com/bluerobotics/tgy/
+
