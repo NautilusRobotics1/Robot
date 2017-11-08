@@ -1,15 +1,14 @@
 #include "Sensor.h"
 // basic variables
+int pins = ;
+int sizeOfPins = ;
 
-AccelerometerDriver( ) {
-  
-}
+AccelerometerDriver( ) : Sensor(pins,sizeOfPins) { }
 
-void init( int UPDATE_INTERVAL ) {
-  
+void init(int INTERVAL) {
+
 }
 
 void update( ) {
-  
-}
 
+}

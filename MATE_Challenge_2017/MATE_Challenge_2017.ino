@@ -14,9 +14,9 @@ using namespace std;
 
 // include necessary drivers
 // Autonomous
-  // Simple Navigator
-  // Simple Pilot
-  // Simple Planner
+//#include "SimpleNavigator.cpp"
+//#include "SimplePilot.cpp
+//#include "SimplePlanner.cpp"
 #include "MotorDriver.cpp"
 #include "CompassDriver.cpp"
 #include "GyroscopeDriver.cpp"
@@ -49,6 +49,10 @@ Sensor* leak = new LeakDriver( );
 Sensor* proximity = new ProximityDriver( );
 Sensor* temp = new TemperatureDriver( );
 Sensor* accelerometer = new AccelerometerDriver( );
+// In SimpleNavigator, utilize any sensor information that affects navigation
+Navigator* navigator = new SimpleNavigator( *compass );
+Pilot* pilot = new SimplePilot( *navigator, *motorDriver );
+Planner* planner = new SimplePlanner( *navigator, *pilot );
 
 // toggle this boolean to enable/disable timer interrupt update calls
 volatile bool isUpdateEnabled = true;

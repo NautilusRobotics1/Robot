@@ -1,15 +1,21 @@
-#include "Sensor.h"
+#include "Driver.h"
 // basic variables
 
-MotorDriver( ) {
-  
+class MotorDriver : Driver {
+  public:
+    MotorDriver( )
+    void init(int INTERVAL);
+    void update( );
 }
 
-void init( int UPDATE_INTERVAL ) {
-  
+MotorDriver( ) : Driver(**,**){
+
+}
+
+void init(int UPDATE_INTERVAL) {
+
 }
 
 void update( ) {
-  
-}
 
+}
