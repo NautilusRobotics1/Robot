@@ -2,7 +2,7 @@ import serial
 ser = serial.Serial('/dev/ttyACMO',9600, timeout=1)
 
 while True:
-	reading = ser.readline()
+	#reading = ser.readline()
 	#print(reading)
 	#TODO: Do Something
 
