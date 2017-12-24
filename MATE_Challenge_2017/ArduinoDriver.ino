@@ -55,66 +55,74 @@ void recvInfo() {
 }
 
 // Used to interface with sensors
+// Serial.print vs Serial.write: http://forum.arduino.cc/index.php?topic=42603.0
+//   Serial.print: Prints a string
+//   Serial.print(value, BYTE): method will handle non-byte size inputs, sending multiple bytes as required
+//   Serial.write(): method will handle only byte size inputs
 void sendInfo() {
 
   Accelerometer *accelerometer = Sensors::getAccelerometer();
   if(accelerometer) {
 
       Vector3 a = accelerometer->getAcceleration();
-      Serial.print("Acceleration (m/s^2)  ");
-      Serial.print(a.x);
-      Serial.print(", ");
-      Serial.print(a.y);
-      Serial.print(", ");
-      Serial.println(a.z);
+
+      Serial.print(a.x, BYTE);
+      Serial.print(a.y, BYTE);
+      Serial.print(a.z, BYTE);
+  }
+  else {
+  	sendnNull(3);
   }
 
   Barometer *barometer = Sensors::getBarometer();
   if(barometer) {
 
       float p = barometer->getPressure();
-      Serial.print("Pressure (hPa)        ");
-      Serial.println(p);
+      Serial.print(p, BYTE);
 
       float a = barometer->getAltitude();
-      Serial.print("Altitude (m)          ");
-      Serial.println(a);
+      Serial.print(a, BYTE);
+  }
+  else {
+  	sendnNull(3);
   }
 
   Gyroscope *gyroscope = Sensors::getGyroscope();
   if(gyroscope) {
 
       Vector3 g = gyroscope->getRotation();
-      Serial.print("Rotation (rad/s)      ");
-      Serial.print(g.x);
-      Serial.print(", ");
-      Serial.print(g.y);
-      Serial.print(", ");
-      Serial.println(g.z);
+      Serial.print(g.x, BYTE);
+      Serial.print(g.y, BYTE);
+      Serial.print(g.z, BYTE);
   }
+  else {
+  	sendnNull(3);
+  }
+
 
   Magnetometer *magnetometer = Sensors::getMagnetometer();
   if(magnetometer) {
 
       Vector3 m = magnetometer->getMagneticField();
-      Serial.print("Magnetic Field (uT)   ");
-      Serial.print(m.x);
-      Serial.print(", ");
-      Serial.print(m.y);
-      Serial.print(", ");
-      Serial.println(m.z);
+      Serial.print(m.x, BYTE);
+      Serial.print(m.y, BYTE);
+      Serial.print(m.z, BYTE);
 
       float azimuth = magnetometer->getAzimuth();
-      Serial.print("Azimuth (deg)         ");
-      Serial.println(azimuth);
+      Serial.print(azimuth, BYTE);
+  }
+  else {
+  	sendnNull(4);
   }
 
   Thermometer *thermometer = Sensors::getThermometer();
   if(thermometer) {
 
       float t = thermometer->getTemperature();
-      Serial.print("Temperature (C)       ");
-      Serial.println(t);
+      Serial.print(t, BYTE);
+  }
+  else {
+  	sendnNull(1);
   }
 
   delay(50);
@@ -123,6 +131,8 @@ void sendInfo() {
 // Baseline code recieved from: http://www.instructables.com/id/Connect-Your-Raspberry-Pi-and-Arduino-Uno/
 // Sensor code recieved from: Sensor example
 
-
+void sendnNull(int &n) {
+  while(n-- > 0) Serial.print(float(NULL), BYTE)
+}
 
 
