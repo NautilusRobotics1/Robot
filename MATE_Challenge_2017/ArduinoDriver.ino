@@ -38,13 +38,14 @@ void setup(){
 void loop() {
 
   recvInfo();
-  lightLED();
+  sendInfo();
   
 }
 
 // Used to interface with motors
 void recvInfo() {
 
+  // TODO: Modify for motor controls
   if (Serial.available() > 0) {
 
       receivedChar = Serial.read();
@@ -119,22 +120,9 @@ void sendInfo() {
   delay(50);
 }
 
-/*
-void lightLED() {
-
-  // Used to identify the pin
-  int led = (receivedChar - '0');
-
-  while(newData == true) {
-
-    digitalWrite(led, HIGH);
-    delay(2000);
-    digitalWrite(led, LOW);
-
-    newData = false;    
-  }
-  
-}
-*/
 // Baseline code recieved from: http://www.instructables.com/id/Connect-Your-Raspberry-Pi-and-Arduino-Uno/
 // Sensor code recieved from: Sensor example
+
+
+
+

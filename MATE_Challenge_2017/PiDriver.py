@@ -1,13 +1,16 @@
 import serial
 import socket
+import signal
+import sys
 
 # Initializing Socket Communication
 ser = serial.Serial('/dev/ttyACMO',9600, timeout=1)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Main Thread
-# Todo account for SIGTERM (i.e. kill signal) and flush_in_buffer
 while True:
+	# Error Handling
+	signal.signal(signal.SIGTERM, signal_term_handler)
 
 	# Motor Code
     readFromLaptop()
@@ -28,19 +31,32 @@ def readFromArduino():
 	# y = ser.read(10) # Reading 10 bytes
 	# line = ser.readline() # Reading until EOL
 
+	# Reading Sensor Data
+    # Bytes 0-11 are from Accelerometer
+    # Byte 12 from Pressure
+    # Byte 13 from Altitude
+    # Byte 14-25 from Gyroscope
+    # Bye 26 from Azimuth
+    # Byte 27 from Temp
 	message =  ser.read(27)
-		# Reading Sensor Data
-	    # Bytes 0-11 are from Accelerometer
-	    # Byte 12 from Pressure
-	    # Byte 13 from Altitude
-	    # Byte 14-25 from Gyroscope
-	    # Bye 26 from Azimuth
-	    # Byte 27 from Temp
 
 	return message;
+	# Learned via: http://pyserial.readthedocs.io/en/latest/shortintro.html
 
 def writeToArduino():
 	# TODO
 
 def readFromLaptop():
 	# TODO: David Chau
+
+# Error Handling
+def signal_term_handler(signal, frame):
+	print 'got SIGTERM'
+	serial.flush_in_buffer()
+	sys.exit(0)	
+
+	# Handling a Kill Signal from: https://nattster.wordpress.com/2013/06/05/catch-kill-signal-in-python/
+
+
+
+
