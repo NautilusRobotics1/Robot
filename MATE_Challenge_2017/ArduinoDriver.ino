@@ -8,6 +8,9 @@
  * David Chau
  * Caleb Yang
  * 
+ * Notes:
+ *  Baseline code recieved from: http://www.instructables.com/id/Connect-Your-Raspberry-Pi-and-Arduino-Uno/
+ *  Sensor code recieved from: Sensor example
  */
 
 #include "Arduino.h"
@@ -55,10 +58,12 @@ void recvInfo() {
 }
 
 // Used to interface with sensors
-// Serial.print vs Serial.write: http://forum.arduino.cc/index.php?topic=42603.0
-//   Serial.print: Prints a string
-//   Serial.print(value, BYTE): method will handle non-byte size inputs, sending multiple bytes as required
-//   Serial.write(): method will handle only byte size inputs
+/*
+ * Serial.print vs Serial.write: http://forum.arduino.cc/index.php?topic=42603.0
+ * Serial.print: Prints a string
+ * Serial.print(value, BYTE): method will handle non-byte size inputs, sending multiple bytes as required
+ * Serial.write(): method will handle only byte size inputs
+ */
 void sendInfo() {
 
   Accelerometer *accelerometer = Sensors::getAccelerometer();
@@ -127,9 +132,6 @@ void sendInfo() {
 
   delay(50);
 }
-
-// Baseline code recieved from: http://www.instructables.com/id/Connect-Your-Raspberry-Pi-and-Arduino-Uno/
-// Sensor code recieved from: Sensor example
 
 void sendnNull(int &n) {
   while(n-- > 0) Serial.print(float(NULL), BYTE)
