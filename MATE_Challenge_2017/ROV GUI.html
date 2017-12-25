@@ -1,31 +1,64 @@
 <html>
-   <head>
-      
-   </head>
-   <body>
-      <div style="text-align: center;"><img src="http://192.168.137.87:8080/stream/video.mjpeg"/></div>
-      <p id="Accelerometer"></p>
-      <p id="Berometer"></p>
-      <p id="Gyroscope"></p>
-      <p id="Magnetometer"></p>
-      <p id="Thermometer"></p>
-      <script>
-      var aX = 0; var aY = 0; var aZ = 0;
+  <head>
+
+  </head>
+  <body>
+    <div style="text-align: center;"><img src="http://192.168.137.87:8080/stream/video.mjpeg"/></div>
+    <div id="socket"> </div>
+    <script>
+      // From: https://stackoverflow.com/questions/12407778/connecting-to-tcp-socket-from-browser-using-javascript
+
+	    // Host we are connecting to
+	    var host = 'localhost';
+	    // Port we are connecting on
+	    var port = 3000;
+
+	    var socket = new jSocket();
+
+	    // When the socket is added the to document
+	    socket.onReady = function(){
+	      socket.connect(host, port);
+	    }
+
+	    // Connection attempt finished
+	    socket.onConnect = function(success, msg){
+	      if(success){
+	        // Send something to the socket
+	        socket.write('Hello world');
+	      }else{
+	        alert('Connection to the server could not be estabilished: ' + msg);
+	      }
+	    }
+	    socket.onData = function(data){
+	            alert('Received from socket: '+data);
+	    }
+
+	    // Setup our socket in the div with the id="socket"
+	    socket.setup('mySocket');
+    </script>
+    <p id="Accelerometer"></p>
+    <p id="Berometer"></p>
+    <p id="Gyroscope"></p>
+    <p id="Magnetometer"></p>
+    <p id="Thermometer"></p>
+    <script>
+      var aX = socket.readByte(); var aY = socket.readByte(); var aZ = socket.readByte();
       document.getElementById("Accelerometer").innerHTML = "Acceleration x:" + aX + ", y:" + aY + ", z:" + aZ;
 
-      var pres = 0; var alt = 0;
+      var pres = socket.readByte(); var alt = socket.readByte();
       document.getElementById("Berometer").innerHTML = "Pressure:" + pres + "\nAltitude: " + alt;
 
-      var gX = 0; var gY = 0; var gZ = 0;
+      var gX = socket.readByte(); var gY = socket.readByte(); var gZ = socket.readByte();
       document.getElementById("Gyroscope").innerHTML = "";
 
-      var mX = 0; var mY = 0; var mZ = 0; var azimuth = 0;
+      var mX = socket.readByte(); var mY = socket.readByte(); var mZ = socket.readByte();
+      var azimuth = socket.readByte();
       document.getElementById("Magnetometer").innerHTML = "";
 
-      var temp = 0;
+      var temp = socket.readByte();
       document.getElementById("Therometer").innerHTML = "";
-      </script>
-   </body>
+    </script>
+  </body>
 </html>
 
 <!--WebSockets: https://stackoverflow.com/questions/1736382/how-to-use-sockets-in-javascript-html-->
