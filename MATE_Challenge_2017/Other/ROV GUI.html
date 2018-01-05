@@ -1,0 +1,32 @@
+<html>
+   <head>
+      
+   </head>
+   <body>
+      <div style="text-align: center;"><img src="http://10.0.0.100:8080/stream/video.mjpeg"/></div>
+      <p id="Accelerometer"></p>
+      <p id="Berometer"></p>
+      <p id="Gyroscope"></p>
+      <p id="Magnetometer"></p>
+      <p id="Thermometer"></p>
+      <script>
+      var aX = 0; var aY = 0; var aZ = 0;
+      document.getElementById("Accelerometer").innerHTML = "Acceleration x:" + aX + ", y:" + aY + ", z:" + aZ;
+
+      var pres = 0; var alt = 0;
+      document.getElementById("Berometer").innerHTML = "Pressure:" + pres + "\nAltitude: " + alt;
+
+      var gX = 0; var gY = 0; var gZ = 0;
+      document.getElementById("Gyroscope").innerHTML = "";
+
+      var mX = 0; var mY = 0; var mZ = 0; var azimuth = 0;
+      document.getElementById("Magnetometer").innerHTML = "";
+
+      var temp = 0;
+      document.getElementById("Therometer").innerHTML = "";
+      </script>
+   </body>
+</html>
+
+<!--WebSockets: https://stackoverflow.com/questions/1736382/how-to-use-sockets-in-javascript-html-->
+<!--Bytes on JS: http://50linesofco.de/post/2017-02-13-bits-and-bytes-in-javascript-->

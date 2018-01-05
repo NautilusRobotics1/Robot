@@ -18,6 +18,10 @@ pygame.init()
 j = pygame.joystick.Joystick(0)
 j.init()
 print 'Initialized Joystick : %s' % j.get_name()
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
+host = '192.168.137.48' # ip of raspberry pi 
+port = 12345
 """
 Returns a vector of the following form:
 [LThumbstickX, LThumbstickY, Unknown Coupled Axis???, 
@@ -47,10 +51,7 @@ def get():
         it+=1
     return out
 
-try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
-    host = '192.168.137.48' # ip of raspberry pi 
-    port = 12345               
+try:               
     s.connect((host, port))
 except:
     print 'Try connecting again'
