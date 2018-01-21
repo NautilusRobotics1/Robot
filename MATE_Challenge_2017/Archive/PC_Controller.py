@@ -22,7 +22,7 @@ j.init()
 print 'Initialized Joystick : %s' % j.get_name()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
-host = '192.168.137.173' # ip of raspberry pi 
+host = '192.168.137.9' # ip of raspberry pi 
 port = 12345
 
 pi_connection = False
@@ -33,7 +33,7 @@ while pi_connection is False:
         pi_connection = True
     except:
         pass
-    
+  
 time.sleep(3)
 """
 Returns a vector of the following form:
@@ -56,7 +56,7 @@ def get():
     
     #Read input from the two joysticks       
     for i in range(0, j.get_numaxes()):
-        out[it] = j.get_axis(i)
+        out[it] = (1500 + 400*float(format(round(j.get_axis(i),4))))
         it+=1
     #Read input from buttons
     for i in range(0, j.get_numbuttons()):
@@ -64,8 +64,10 @@ def get():
         it+=1
     return out
 
-while True:    
-    data = cPickle.dumps(get(),0)
+while True:
+    value = get()
+    print value
+    data = cPickle.dumps(value,0)
     s.send(data)
-    time.sleep(0.03) #delay for the raspberry pi server
+    time.sleep(0.04) #delay for the raspberry pi server
 
