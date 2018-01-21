@@ -1,5 +1,5 @@
 /**
- *webserver.js
+ * webserver.js
  * @auther David Chau
  * @version 1.0 
  * 
@@ -47,15 +47,20 @@ function fullThrottle(percent){
 }
 
 function navagate(data){
-	motorEsc[0].speed(halfThrottle(-data[1]));
-	motorEsc[1].speed(halfThrottle(-data[1]));
-	motorEsc[2].speed(halfThrottle(data[1]));
-	motorEsc[3].speed(halfThrottle(data[1]));
-	if(data[2]>50.01 || data[2]<50.01){
-	motorEsc[0].speed(halfThrottle(data[1]));
-	motorEsc[1].speed(halfThrottle(data[1]));
-	motorEsc[2].speed(halfThrottle(data[2]));
-	motorEsc[3].speed(halfThrottle(data[2]));
+	if(data[2] > 0.1 || data[2] < 0){
+		motorEsc[0].speed(halfThrottle(data[1]));	//
+		motorEsc[1].speed(halfThrottle(data[1]));	//
+		motorEsc[2].speed(halfThrottle(data[2]));	//
+		motorEsc[3].speed(halfThrottle(data[2]));	//
+		motorEsc[4].speed(halfThrottle(data[4]));	//
+		motorEsc[5].speed(halfThrottle(data[4]));	//
+	} else {
+		motorEsc[0].speed(halfThrottle(data[1]));	//
+		motorEsc[1].speed(halfThrottle(data[1]));	//
+		motorEsc[2].speed(halfThrottle(data[1]));	//
+		motorEsc[3].speed(halfThrottle(data[1]));	//
+		motorEsc[4].speed(halfThrottle(data[4]));	//	
+		motorEsc[5].speed(halfThrottle(data[4]));	//
 	}
 }
 
