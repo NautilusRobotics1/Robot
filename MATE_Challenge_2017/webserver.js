@@ -1,6 +1,6 @@
 /**
  * webserver.js
- * @auther David Chau
+ * @author David Chau
  * @version 1.0 
  * 
  */
@@ -12,9 +12,9 @@ var io = require('socket.io').listen(app.listen(port));
 
 var five = require("johnny-five");
 var board = new five.Board();
-var motorEsc;
+var motorEsc, adafruitSensor;
 
-//create socket server to retreve data from controller
+//create socket server to retrieve data from controller
 io.on('connection', function(socket) {
 	console.log('client connected');
 	socket.on('notping', function(data) {
