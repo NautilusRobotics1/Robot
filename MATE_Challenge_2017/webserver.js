@@ -12,7 +12,7 @@ var io = require('socket.io').listen(app.listen(port));
 
 var five = require("johnny-five");
 var board = new five.Board();
-var motorEsc, adafruitSensor;
+var motorEsc;
 
 //create socket server to retrieve data from controller
 io.on('connection', function(socket) {

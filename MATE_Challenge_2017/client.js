@@ -1,12 +1,9 @@
-/*
-<div id="sensors">
-<p id="Accelerometer"></p>
-<p id="Berometer"></p>
-<p id="Gyroscope"></p>
-<p id="Magnetometer"></p>
-<p id="Thermometer"></p>
-</div>
-*/
+/**
+ * client.js
+ * @author Caleb Yang
+ * @version 1.0 
+ * 
+ */
 
 var five = require("johnny-five");
 var board = new five.Board();
