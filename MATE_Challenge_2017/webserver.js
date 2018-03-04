@@ -13,6 +13,7 @@ var io = require('socket.io').listen(app.listen(port));
 var five = require("johnny-five");
 var board = new five.Board();
 var motorEsc;
+var adafruitSensor, barometer;
 
 //create socket server to retrieve data from controller
 io.on('connection', function(socket) {
@@ -33,6 +34,8 @@ app.get('/', function(req, res) {
 //connects to arduino and create the esc objects on corrisponding pins
 board.on("ready", function() {
   motorEsc = new five.ESCs([11, 10, 9, 6, 5, 3]);
+  adafruitSensor = new five.IMU([21,20]);
+  barometer = new five.Barometer([21,20]);
 });
 
 //Makes the throttle response of the motors. For bi-directional esc 50 is midpoint(off).
@@ -64,5 +67,16 @@ function navagate(data){
 	}
 }
 
+adafruitSensor.on("data", function() {
+    var accel = this.accelerometer;
+    var gyro = this.gyro;
+    var temp = this.temperature.celsius;
+    console.log("Accelerometer: %d, %d, %d", accel.x, accel.z, accel.z);
+    console.log("Gyro: %d, %d, %d", gyro.x, gyro.z, gyro.z);
+    console.log("Temperature: %d", temp.celsius);
+});
 
+barometer.on("data", function() {
+    console.log("  pressure : ", this.pressure);
+});
 
