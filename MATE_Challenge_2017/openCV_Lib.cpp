@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat, Scalar)
 #include <opencv2/imgproc.hpp>  // Gaussian Blur
 #include <opencv2/highgui.hpp>  // OpenCV window I/O
-#include<opencv2/ml/ml.hpp>
+#include <opencv2/ml/ml.hpp>
 
 // global variables
 const int MIN_CONTOUR_AREA = 100;
@@ -17,7 +17,7 @@ void static uploadTrainingData (cv::Mat _matClassificationInts, cv::Mat _matTrai
 
     if (fsClassifications.isOpened() == false) {                                                        // if the file was not opened successfully
         std::cout << "error, unable to open training classifications file, exiting program\n\n";        // show error message
-        return(0);                                                                                      // and exit program
+        return;                                                                                      // and exit program
     }
 
     fsClassifications << "classifications" << _matClassificationInts;        // write classifications into classifications section of classifications file
@@ -29,20 +29,20 @@ void static uploadTrainingData (cv::Mat _matClassificationInts, cv::Mat _matTrai
 
     if (fsTrainingImages.isOpened() == false) {                                                 // if the file was not opened successfully
         std::cout << "error, unable to open training images file, exiting program\n\n";         // show error message
-        return(0);                                                                              // and exit program
+        return;                                                                              // and exit program
     }
 
     fsTrainingImages << "images" << _matTrainingImagesAsFlattenedFloats;         // write training images into images section of images file
     fsTrainingImages.release();                                                 // close the training images file
 }
 
-void static loadTrainingData(cv:Mat &_matClassificationInts, cv:Mat &_matTrainingImagesAsFlattenedFloats)
+void static loadTrainingData(cv::Mat &_matClassificationInts, cv::Mat &_matTrainingImagesAsFlattenedFloats)
 {
     cv::FileStorage fsClassifications("classifications.xml", cv::FileStorage::READ);        // open the classifications file
 
     if (fsClassifications.isOpened() == false) {                                                    // if the file was not opened successfully
-        std::std::cout << "error, unable to open training classifications file, exiting program\n\n";    // show error message
-        return(0);                                                                                  // and exit program
+        std::cout << "error, unable to open training classifications file, exiting program\n\n";    // show error message
+        return;                                                                                  // and exit program
     }
 
     fsClassifications["classifications"] >> _matClassificationInts;      // read classifications section into Mat classifications variable
@@ -51,8 +51,8 @@ void static loadTrainingData(cv:Mat &_matClassificationInts, cv:Mat &_matTrainin
     cv::FileStorage fsTrainingImages("images.xml", cv::FileStorage::READ);          // open the training images file
 
     if (fsTrainingImages.isOpened() == false) {                                                 // if the file was not opened successfully
-        std::std::cout << "error, unable to open training images file, exiting program\n\n";         // show error message
-        return(0);                                                                              // and exit program
+        std::cout << "error, unable to open training images file, exiting program\n\n";         // show error message
+        return;                                                                              // and exit program
     }
 
     fsTrainingImages["images"] >> _matTrainingImagesAsFlattenedFloats;           // read images section into Mat training images variable
@@ -67,7 +67,7 @@ void static processFrame (cv::Mat &imgSrc, std::vector<std::vector<cv::Point> > 
 
     if (imgSrc.empty()) {                               // if unable to open image
         std::cout << "error: image not read\n\n";         // show error message on command line
-        return(0);                                                  // and exit program
+        return;                                                  // and exit program
     }
 
     cv::cvtColor(imgSrc, imgGrayscale, CV_BGR2GRAY);        // convert to grayscale

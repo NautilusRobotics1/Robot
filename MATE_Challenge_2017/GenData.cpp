@@ -21,7 +21,6 @@ int main() {
     // Needs ValidColor {Red,Blue,Yellow};
 
     imgTrainingNumbers = cv::imread("training_chars2.png");          // read in training numbers image
-
     processFrame(imgTrainingNumbers, ptContours, v4iHierarchy);
 
     for (int i = 0; i < ptContours.size(); i++) {                           // for each contour
