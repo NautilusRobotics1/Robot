@@ -1,12 +1,12 @@
-// GenData.cpp
+ // GenData.cpp
 
-#include "openCV_Lib.cpp"
+#include "openCV_Lib.h"
 
 int main() {
-    cv::Mat imgTrainingNumbers;         // input image
+    cv::Mat imgTrainingNumbers;
 
-    std::vector<std::vector<cv::Point> > ptContours;        // declare contours vector
-    std::vector<cv::Vec4i> v4iHierarchy;                    // declare contours hierarchy
+    std::vector<std::vector<cv::Point> > ptContours;
+    std::vector<cv::Vec4i> v4iHierarchy;
 
     cv::Mat matClassificationInts;
     cv::Mat matTrainingImagesAsFlattenedFloats;
@@ -20,9 +20,9 @@ int main() {
     // Needs ValidShapes {Triangle, Trapezoid, Rectangle};
     // Needs ValidColor {Red,Blue,Yellow};
 
-    imgTrainingNumbers = cv::imread("training_chars2.png");          // read in training numbers image
-    processFrame(imgTrainingNumbers, ptContours, v4iHierarchy);
-
+    imgTrainingNumbers = cv::imread("training_chars.png");
+    cv::Mat imgThresh = processFrame(imgTrainingNumbers, ptContours, v4iHierarchy);
+    
     for (int i = 0; i < ptContours.size(); i++) {                           // for each contour
         if (cv::contourArea(ptContours[i]) > MIN_CONTOUR_AREA) {                // if contour is big enough to consider
             cv::Rect boundingRect = cv::boundingRect(ptContours[i]);                // get the bounding rect
@@ -62,6 +62,6 @@ int main() {
 
     uploadTrainingData(matClassificationInts, matTrainingImagesAsFlattenedFloats);
 
-    return(0);
+    return 0;
 }
 

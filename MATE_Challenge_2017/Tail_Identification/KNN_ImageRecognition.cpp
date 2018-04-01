@@ -4,7 +4,7 @@
 #include <sstream>  // string to number conversion
 #include <opencv2/videoio.hpp>
 
-#include "openCV_Lib.cpp"
+#include "openCV_Lib.h"
 
 class ContourWithData {
     public:
@@ -24,7 +24,7 @@ class ContourWithData {
         }
 };
 
-void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWithData> &_validContoursWithData, cv::Mat imgSrc, std::string &_strFinalString);
+void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWithData> &_validContoursWithData, cv::Mat imgSrc, cv::Mat matThresh, std::string &_strFinalString);
 
 int main(int argc, char *argv[])
 {
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWithData> &_validContoursWithData, cv::Mat imgSrc, std::string &_strFinalString)
+void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWithData> &_validContoursWithData, cv::Mat imgSrc, cv::Mat matThresh, std::string &_strFinalString)
 {
     // for each contour
     for (int i = 0; i < _validContoursWithData.size(); i++) {
