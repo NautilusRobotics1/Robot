@@ -1,0 +1,42 @@
+Note: The taken code for ContourWithData's checkIfContourIsValid isn't robust enough
+Note: Normalize the image to compensate for bad lighting 
+  // https://stackoverflow.com/questions/25962893/detect-a-colored-ball-regardless-of-the-light
+
+// Per frame
+allContoursWithData
+validContoursWithData
+
+// Loading to
+matClassificationInts // Uploaded mapping alphanumeric classes
+matTrainingImagesAsFlattenedFloats // Uploaded mapping 
+
+// Loading from
+fsClassifications // from a classifications.xml
+fsTrainingImages // from a images.xml
+
+// KNN
+kNearest
+
+// Sample Reference
+matTestingNumbers
+
+// Sample Reference Processing
+matGrayscale
+matBlurred
+matThresh
+matThreshCopy
+
+// Output of findContours
+ptContours // vector of all contours in frame
+v4iHierachy // unused output of findContours
+
+// Per valid contour
+matROI // Sample image cut from frame
+matROIResized
+matROIFloat // Transformed from imageMatrix to a float
+matROIFlattenedFloat
+matCurrentChar // dummy variable to find mapping
+fltCurrentChar // final mapping output format
+
+// Final output
+strFinalString
