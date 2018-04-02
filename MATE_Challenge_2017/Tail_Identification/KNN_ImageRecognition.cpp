@@ -35,7 +35,6 @@ int main(int argc, char *argv[])
         std::cout  << "Could not open reference vide" << std::endl;
         return -1;
     }
-
     const char* WIN_RF = "Reference";
 
     /*******************Loading Train Data*************************/
@@ -54,21 +53,26 @@ int main(int argc, char *argv[])
     std::vector<cv::Vec4i> v4iHierarchy;                    // declare contours hierarchy
     cv::Mat frameReference;
 
-    for(;;) // takes a frame and process it for colors/shapes/alphanumerics
+    /*******************Processing Frame***************************/
+    // takes a frame and process it for colors/shapes/alphanumerics
+    for(;;)
     {
-        /*******************Processing Frame***************************/
         captRefrnc >> frameReference;
-        processFrame(frameReference, ptContours, v4iHierarchy);
-        for (int i = 0; i < ptContours.size(); i++) {               // for each contour
-            ContourWithData contourWithData;                                                    // instantiate a contour with data object
-            contourWithData.ptContour = ptContours[i];                                          // assign contour to contour with data
-            contourWithData.boundingRect = cv::boundingRect(contourWithData.ptContour);         // get the bounding rect
-            contourWithData.fltArea = cv::contourArea(contourWithData.ptContour);               // calculate the contour area
-            allContoursWithData.push_back(contourWithData);                                     // add contour with data object to list of all contours with data
+        cv::Mat imgThresh = processFrame(frameReference, ptContours, v4iHierarchy);
+
+        // Initialize allContoursWithData w/ boundingRect area
+        for (int i = 0; i < ptContours.size(); i++) {
+            ContourWithData contourWithData;
+            contourWithData.ptContour = ptContours[i];
+            contourWithData.boundingRect = cv::boundingRect(contourWithData.ptContour);
+            contourWithData.fltArea = cv::contourArea(contourWithData.ptContour);
+            allContoursWithData.push_back(contourWithData);
         }
-        for (int i = 0; i < allContoursWithData.size(); i++) {                      // for all contours
-            if (allContoursWithData[i].checkIfContourIsValid()) {                   // check if valid
-                validContoursWithData.push_back(allContoursWithData[i]);            // if so, append to valid contour list
+
+        // Filter out invalid contours
+        for (int i = 0; i < allContoursWithData.size(); i++) {
+            if (allContoursWithData[i].checkIfContourIsValid()) {
+                validContoursWithData.push_back(allContoursWithData[i]);
             }
         }
         // sort contours from left to right
@@ -76,14 +80,11 @@ int main(int argc, char *argv[])
 
         // End output, label
         std::string strFinalString;
+        processContours(kNearest,validContoursWithData,frameReference,imgThresh,strFinalString);
 
-        processContours(kNearest,validContoursWithData,frameReference,strFinalString);
-
-      /*
-        std::std::cout << "\n\n" << "numbers read = " << strFinalString << "\n\n";       // show the full string
-        cv::imshow("matTestingNumbers", matTestingNumbers);     // show input image with green boxes drawn around found digits
-      */
-        imshow(WIN_RF, frameReference);
+        // show final string & input image with green boxes drawn around found digits
+        std::cout << "\n\n" << "numbers read = " << strFinalString << "\n\n";
+        imshow(WIN_RF, frameReference); 
         char c = (char)cv::waitKey(20);
         if (c == 27) break;
     }
@@ -92,32 +93,29 @@ int main(int argc, char *argv[])
 
 void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWithData> &_validContoursWithData, cv::Mat imgSrc, cv::Mat matThresh, std::string &_strFinalString)
 {
-    // for each contour
     for (int i = 0; i < _validContoursWithData.size(); i++) {
+        // draw a green rect around the current char atop original image
+        cv::rectangle(imgSrc, _validContoursWithData[i].boundingRect, cv::Scalar(0, 255, 0), 2);
 
-        // draw a green rect around the current char
-        cv::rectangle(imgSrc,  // draw rectangle on original image
-            _validContoursWithData[i].boundingRect,  // rect to draw
-            cv::Scalar(0, 255, 0),  // green
-            2);  // thickness
+        // get ROI image of bounding rect
+        cv::Mat matROI = matThresh(_validContoursWithData[i].boundingRect);
 
-        cv::Mat matROI = matThresh(_validContoursWithData[i].boundingRect);  // get ROI image of bounding rect
-
+        // resize image, this will be more consistent for recognition and storage
         cv::Mat matROIResized;
-        cv::resize(matROI, matROIResized, cv::Size(RESIZED_IMAGE_WIDTH, RESIZED_IMAGE_HEIGHT));  // resize image, this will be more consistent for recognition and storage
+        cv::resize(matROI, matROIResized, cv::Size(RESIZED_IMAGE_WIDTH, RESIZED_IMAGE_HEIGHT));
 
+        // convert Mat to float, necessary for call to find_nearest
         cv::Mat matROIFloat;
-        matROIResized.convertTo(matROIFloat, CV_32FC1);  // convert Mat to float, necessary for call to find_nearest
-
+        matROIResized.convertTo(matROIFloat, CV_32FC1);  
         cv::Mat matROIFlattenedFloat = matROIFloat.reshape(1, 1);
 
+        // Use KNN to determine the right classification for contour
         cv::Mat matCurrentChar(0, 0, CV_32F);
-
-        _kNearest->findNearest(matROIFlattenedFloat, 1, matCurrentChar);     // finally we can call find_nearest !!!
-
+        _kNearest->findNearest(matROIFlattenedFloat, 1, matCurrentChar);
         float fltCurrentChar = (float)matCurrentChar.at<float>(0, 0);
 
-        _strFinalString = _strFinalString + char(int(fltCurrentChar));        // append current char to full string
+        // append current char to full string
+        _strFinalString = _strFinalString + char(int(fltCurrentChar));
     }
 }
 
