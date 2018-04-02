@@ -29,12 +29,13 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
 int main(int argc, char *argv[])
 {
     /*******************Init Video Feed****************************/
+  /* TODO
     cv::VideoCapture captRefrnc(0); // Using the default camera
     if (!captRefrnc.isOpened())
     {
         std::cout  << "Could not open reference vide" << std::endl;
         return -1;
-    }
+    }*/
     const char* WIN_RF = "Reference";
 
     /*******************Loading Train Data*************************/
@@ -57,7 +58,8 @@ int main(int argc, char *argv[])
     // takes a frame and process it for colors/shapes/alphanumerics
     for(;;)
     {
-        captRefrnc >> frameReference;
+        //captRefrnc >> frameReference; TODO
+        frameReference = cv::imread("tail_sample3.png");
         cv::Mat imgThresh = processFrame(frameReference, ptContours, v4iHierarchy);
 
         // Initialize allContoursWithData w/ boundingRect area
@@ -113,6 +115,9 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
         cv::Mat matCurrentChar(0, 0, CV_32F);
         _kNearest->findNearest(matROIFlattenedFloat, 1, matCurrentChar);
         float fltCurrentChar = (float)matCurrentChar.at<float>(0, 0);
+
+        // TODO: Filter out results that also match a shape
+        // Note: There will be problems with letters such as L / I / T / Z
 
         // append current char to full string
         _strFinalString = _strFinalString + char(int(fltCurrentChar));
