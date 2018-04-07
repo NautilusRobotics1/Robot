@@ -32,7 +32,7 @@ void static uploadTrainingData (cv::Mat _matClassificationInts, cv::Mat _matTrai
     fsTrainingImages.release();
 }
 
-void static loadTrainingData(cv::Mat &_matClassificationInts, cv::Mat &_matTrainingImagesAsFlattenedFloats)
+void static loadTrainingData (cv::Mat &_matClassificationInts, cv::Mat &_matTrainingImagesAsFlattenedFloats)
 {
     // Load in Classifications Mapping part
     cv::FileStorage fsClassifications("classifications.xml", cv::FileStorage::READ);

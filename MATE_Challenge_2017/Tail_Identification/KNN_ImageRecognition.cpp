@@ -12,7 +12,10 @@ class ContourWithData {
         std::vector<cv::Point> ptContour;           // contour
         cv::Rect boundingRect;                      // bounding rect for contour
         float fltArea;                              // area of contour
+        cv::Moments moment;                         // center of contour
+        bool grouped = false;                       // used to skip already grouped contours
 
+        // TODO: Check for clumping and ratios
         bool checkIfContourIsValid() {
             if (fltArea < MIN_CONTOUR_AREA) return false;
             return true;
@@ -68,11 +71,33 @@ int main(int argc, char *argv[])
             contourWithData.ptContour = ptContours[i];
             contourWithData.boundingRect = cv::boundingRect(contourWithData.ptContour);
             contourWithData.fltArea = cv::contourArea(contourWithData.ptContour);
+            contourWithData.moment = cv::moments(ptContours[i],false);
             allContoursWithData.push_back(contourWithData);
         }
 
+        int r_tol = 18;
+        std::vector<int> labels;
+        int th2 = r_tol * r_tol;
+        /*
+        TODO: Finish clustering
+        int n_labels = partition(allContoursWithData, labels, [r_tol](const std::vector<cv::Point>& lhs, const std::vector<cv::Point>& rhs) {
+          lhs_cX = int(lhs.moment["m10"] / lhs.moment["m00"]);  lhs_cY = int(lhs.moment["m01"] / lhs.moment["m00"]);
+          rhs_cX = int(rhs.moment["m10"] / rhs.moment["m00"]);  rhs_cY = int(rhs.moment["m01"] / rhs.moment["m00"]);
+          return ((lhs_cX - rhs_cX)*(lhs_cX - rhs_cX) + (lhs_cY - rhs_cY)*(lhs_cY - rhs_cY)) < r_tol;
+        });
+
+        vector<vector<Point>> contours(n_labels);
+        for (int i = 0; i < pts.size(); ++i) {
+            contours[labels[i]].push_back(pts[i]);
+        }
+        */
+
         // Filter out invalid contours
         for (int i = 0; i < allContoursWithData.size(); i++) {
+
+          // TODO: Check for Shapes Triangle / Trapezoid / Rectangle
+          // TODO: Check for Grouped Contours of x3 for Lettering
+
             if (allContoursWithData[i].checkIfContourIsValid()) {
                 validContoursWithData.push_back(allContoursWithData[i]);
             }
