@@ -12,8 +12,8 @@ class ContourWithData {
         std::vector<cv::Point> ptContour;           // contour
         cv::Rect boundingRect;                      // bounding rect for contour
         float fltArea;                              // area of contour
-        cv::Moments moment;                         // center of contour
-        bool grouped = false;                       // used to skip already grouped contours
+        //cv::Moments moment;                         // center of contour
+        //bool grouped = false;                       // used to skip already grouped contours
 
         // TODO: Check for clumping and ratios
         bool checkIfContourIsValid() {
@@ -71,37 +71,44 @@ int main(int argc, char *argv[])
             contourWithData.ptContour = ptContours[i];
             contourWithData.boundingRect = cv::boundingRect(contourWithData.ptContour);
             contourWithData.fltArea = cv::contourArea(contourWithData.ptContour);
-            contourWithData.moment = cv::moments(ptContours[i],false);
+            //contourWithData.moment = cv::moments(ptContours[i],false);
             allContoursWithData.push_back(contourWithData);
         }
 
-        int r_tol = 18;
         std::vector<int> labels;
-        int th2 = r_tol * r_tol;
-        /*
-        TODO: Finish clustering
-        int n_labels = partition(allContoursWithData, labels, [r_tol](const std::vector<cv::Point>& lhs, const std::vector<cv::Point>& rhs) {
-          lhs_cX = int(lhs.moment["m10"] / lhs.moment["m00"]);  lhs_cY = int(lhs.moment["m01"] / lhs.moment["m00"]);
-          rhs_cX = int(rhs.moment["m10"] / rhs.moment["m00"]);  rhs_cY = int(rhs.moment["m01"] / rhs.moment["m00"]);
-          return ((lhs_cX - rhs_cX)*(lhs_cX - rhs_cX) + (lhs_cY - rhs_cY)*(lhs_cY - rhs_cY)) < r_tol;
-        });
+		int r_tol = 2;
+        
+        //TODO: Finish clustering
+		// https://stackoverflow.com/questions/33825249/opencv-euclidean-clustering-vs-findcontours/33834092#33834092
+		int n_labels = cv::partition(allContoursWithData, labels, [r_tol](const ContourWithData& lhs, const ContourWithData& rhs) {
+			return std::abs(lhs.fltArea - rhs.fltArea) < r_tol * std::abs(lhs.fltArea - rhs.fltArea);
+		});
 
-        vector<vector<Point>> contours(n_labels);
-        for (int i = 0; i < pts.size(); ++i) {
-            contours[labels[i]].push_back(pts[i]);
+        std::vector< std::vector<cv::Point> > contoursPartitioned(n_labels);
+        for (int i = 0; i < allContoursWithData.size(); ++i) {
+			std::vector<cv::Point> p = allContoursWithData[i].ptContour;
+			contoursPartitioned[labels[i]].emplace_back(p); // Formerly an error on an undefined push_back, but fixed with an emplace_back
         }
-        */
 
         // Filter out invalid contours
+		//  - Condition: in a partition of 3, that are close
+		//	or
+		//  - Condition: in a single partition of 3, with a valid color
         for (int i = 0; i < allContoursWithData.size(); i++) {
-
-          // TODO: Check for Shapes Triangle / Trapezoid / Rectangle
-          // TODO: Check for Grouped Contours of x3 for Lettering
+			// TODO: Check for Shapes Triangle / Trapezoid / Rectangle
+			/*
+			std::vector< std::vector<cv::Point> > approx;
+			approx.resize(validContoursWithData.size());
+			for (int k = 0; k < validContoursWithData.size(); k++) {
+				approxPolyDP(cv::Mat(validContoursWithData[k].ptContour), approx[k], 3, true);
+			}*/
+			// TODO: Check for Grouped Contours of x3 for Lettering
 
             if (allContoursWithData[i].checkIfContourIsValid()) {
                 validContoursWithData.push_back(allContoursWithData[i]);
             }
         }
+		// TODO: Modify and add to each parition
         // sort contours from left to right
         std::sort(validContoursWithData.begin(), validContoursWithData.end(), ContourWithData::sortByBoundingRectXPosition);
 
@@ -140,9 +147,6 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
         cv::Mat matCurrentChar(0, 0, CV_32F);
         _kNearest->findNearest(matROIFlattenedFloat, 1, matCurrentChar);
         float fltCurrentChar = (float)matCurrentChar.at<float>(0, 0);
-
-        // TODO: Filter out results that also match a shape
-        // Note: There will be problems with letters such as L / I / T / Z
 
         // append current char to full string
         _strFinalString = _strFinalString + char(int(fltCurrentChar));

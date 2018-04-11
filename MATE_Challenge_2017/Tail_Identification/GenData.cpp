@@ -1,7 +1,7 @@
  // GenData.cpp
 
 #include "openCV_Lib.h"
-
+/*
 int main() {
     cv::Mat imgTrainingNumbers;
 
@@ -64,4 +64,4 @@ int main() {
 
     return 0;
 }
-
+*/
