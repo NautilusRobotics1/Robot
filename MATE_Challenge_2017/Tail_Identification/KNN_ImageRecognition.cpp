@@ -11,9 +11,8 @@ class ContourWithData {
         // member variables
         std::vector<cv::Point> ptContour;           // contour
         cv::Rect boundingRect;                      // bounding rect for contour
-        float fltArea;                              // area of contour
+        double fltArea;                             // area of contour
         //cv::Moments moment;                         // center of contour
-        //bool grouped = false;                       // used to skip already grouped contours
 
         // TODO: Check for clumping and ratios
         bool checkIfContourIsValid() {
@@ -75,12 +74,11 @@ int main(int argc, char *argv[])
             allContoursWithData.push_back(contourWithData);
         }
 
+		// Preparing for contour partitions
         std::vector<int> labels;
 		int r_tol = 3;
         
-		// cwdLeft.boundingRect.x < cwdRight.boundingRect.x
-
-        //TODO: Finish clustering
+		// Designating contour partitions via lambda filter
 		// https://stackoverflow.com/questions/33825249/opencv-euclidean-clustering-vs-findcontours/33834092#33834092
 		int n_labels = cv::partition(allContoursWithData, labels, [r_tol](const ContourWithData& lhs, const ContourWithData& rhs) {
 			// Filter out by w/h ratio
@@ -99,31 +97,30 @@ int main(int argc, char *argv[])
 				return lhs.fltArea < rhs.fltArea * r_tol;
 		});
 
+		// Loading contour partitions
         std::vector< std::vector<ContourWithData> > contoursPartitioned(n_labels);
         for (int i = 0; i < allContoursWithData.size(); ++i) {
 			contoursPartitioned[labels[i]].emplace_back(allContoursWithData[i]); // Formerly an error on an undefined push_back, but fixed with an emplace_back
         }
 
-        // Filter out invalid contours
-		//  - Condition: in a partition of 3, that are close
-		//	or
-		//  - Condition: in a single partition of 3, with a valid color
+		// Preparing to process contour partitions
 		bool scannedTextTag = false;
-		// End output, label
 		std::string strFinalString;
+
+		// Process contour partitions
 		for (int i = 0; i < contoursPartitioned.size(); i++) {
-			// TODO: Check for Grouped Contours of x3 for Lettering
-			//if (contoursPartitioned[i].size() >= 3 && scannedTextTag == false) {
+			// Check for Grouped Contours of x3 for Lettering
+			if (contoursPartitioned[i].size() >= 3 && scannedTextTag == false) {
 				// sort contours from left to right
 				std::sort(contoursPartitioned[i].begin(), contoursPartitioned[i].end(), ContourWithData::sortByBoundingRectXPosition);
 				// Uses KNN and produces a tag inference
 				processContours(kNearest, contoursPartitioned[i], frameReference, imgThresh, strFinalString);
 				// Determines if strFinalString is appropirate
 				if (!strFinalString.empty()) {
-					scannedTextTag == true;
+					scannedTextTag = true;
 					break;
 				}
-			//}
+			}
 
 			// TODO: Check for Shapes Triangle / Trapezoid / Rectangle
 			if (scannedTextTag) {
@@ -135,16 +132,11 @@ int main(int argc, char *argv[])
 				}*/
 
 			}
-
-			/*
-            if (allContoursWithData[i].checkIfContourIsValid()) {
-                validContoursWithData.push_back(allContoursWithData[i]);
-            }*/
         }
 
         // show final string & input image with green boxes drawn around found digits
         std::cout << "\n\n" << "numbers read = " << strFinalString << "\n\n";
-        //imshow(WIN_RF, frameReference); 
+        imshow(WIN_RF, frameReference); 
         char c = (char)cv::waitKey(20);
         if (c == 27) break;
     }
@@ -155,7 +147,9 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
 {
 	std::string validSubStrings = "UH8L6RG7CSIPJW3A2X"; // Changed 1 to I because at the moment KNN isn't too accurate 
     for (int i = 0; i < _validContoursWithData.size(); i++) {
+		// Preventing an invalid partition from being processed
 		if (!_validContoursWithData[i].checkIfContourIsValid()) break;
+
         // draw a green rect around the current char atop original image
         cv::rectangle(imgSrc, _validContoursWithData[i].boundingRect, cv::Scalar(0, 255, 0), 2);
 
