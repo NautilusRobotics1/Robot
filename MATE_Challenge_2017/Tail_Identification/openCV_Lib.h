@@ -72,7 +72,8 @@ cv::Mat static processFrame (cv::Mat &imgSrc, std::vector<std::vector<cv::Point>
     // make a copy of the thresh image, this in necessary b/c findContours modifies the image
     imgThreshCopy = imgThresh.clone();
     // loads _ptContours with contours cut out from the imgThreshCopy
-    cv::findContours(imgThreshCopy, _ptContours, _v4iHierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+	// https://stackoverflow.com/questions/44601734/cv2-findcontours-not-able-to-detect-contours
+    cv::findContours(imgThreshCopy, _ptContours, _v4iHierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE); // RETR_EXTERNAL to RETR_LIST
 
     return imgThresh;
 }
