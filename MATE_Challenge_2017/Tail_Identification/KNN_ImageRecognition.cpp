@@ -92,16 +92,11 @@ int main(int argc, char *argv[])
 		int n_labels = cv::partition(allContoursWithData, labels, [r_tol,h_tol](const ContourWithData& lhs, const ContourWithData& rhs) {
 			// Filter out by hight differentials
 			if (!(std::abs(lhs.boundingRect.height - rhs.boundingRect.height) < lhs.boundingRect.height*h_tol)) return false;
-
+			/*
 			// Filter out by proximity
 			if (!(lhs.boundingRect.x + lhs.boundingRect.width*2 > rhs.boundingRect.x 
 				&& lhs.boundingRect.x - lhs.boundingRect.width*2 < rhs.boundingRect.x)) return false;
-
-			// Filter out by area
-			if (lhs.fltArea < rhs.fltArea)
-				return rhs.fltArea < lhs.fltArea * r_tol;
-			else
-				return lhs.fltArea < rhs.fltArea * r_tol;
+				*/
 		});
 
 		// Loading contour partitions
