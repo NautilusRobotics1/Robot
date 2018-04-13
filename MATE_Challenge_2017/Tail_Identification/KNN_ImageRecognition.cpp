@@ -14,7 +14,7 @@ class ContourWithData {
         double fltArea;                             // area of contour
         //cv::Moments moment;                         // center of contour
 
-        // TODO: Check for clumping and ratios
+        // TODO: Possibly make more robust
         bool checkIfContourIsValid() {
             if (fltArea < MIN_CONTOUR_AREA) return false;
             return true;
@@ -31,13 +31,12 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
 int main(int argc, char *argv[])
 {
     /*******************Init Video Feed****************************/
-  /* TODO
-    cv::VideoCapture captRefrnc(0); // Using the default camera
-    if (!captRefrnc.isOpened())
-    {
-        std::cout  << "Could not open reference vide" << std::endl;
-        return -1;
-    }*/
+    //cv::VideoCapture captRefrnc(0); // Using the default camera
+    //if (!captRefrnc.isOpened())
+    //{
+    //    std::cout  << "Could not open reference vide" << std::endl;
+    //    return -1;
+    //}
     const char* WIN_RF = "Reference";
 
     /*******************Loading Train Data*************************/
@@ -49,19 +48,29 @@ int main(int argc, char *argv[])
     cv::Ptr<cv::ml::KNearest>  kNearest(cv::ml::KNearest::create());
     kNearest->train(matTrainingImagesAsFlattenedFloats, cv::ml::ROW_SAMPLE, matClassificationInts);
 
-    /*******************Prep for Processing************************/
-    std::vector<ContourWithData> allContoursWithData;
-    std::vector<ContourWithData> validContoursWithData;
-    std::vector<std::vector<cv::Point> > ptContours;        // declare contours vector
-    std::vector<cv::Vec4i> v4iHierarchy;                    // declare contours hierarchy
-    cv::Mat frameReference;
 
-    /*******************Processing Frame***************************/
-    // takes a frame and process it for colors/shapes/alphanumerics
-    for(;;)
-    {
+	std::vector<std::string> trainingImages = {
+		"tailA_1.png", "tailA_2.png", "tailA_3.png", "tailA_4.png", "tailA_5.png",
+		"tailB_1.png", "tailB_2.png", "tailB_3.png", "tailB_4.png",
+		"tailC_1.png", "tailC_2.png", "tailC_3.png", "tailC_4.png",
+		"tailD_1.png", "tailD_2.png", "tailD_3.png", "tailD_4.png",
+		"tailE_1.png", "tailE_2.png", "tailE_3.png", "tailE_4.png",
+		"tailF_1.png", "tailF_2.png", "tailF_3.png", "tailF_4.png"
+	};
+
+	/*******************Processing Frame***************************/
+	// takes a frame and process it for colors/shapes/alphanumerics
+	for (auto& fName: trainingImages) // was for(;;)
+	{
+		/*******************Prep for Processing************************/
+		std::vector<ContourWithData> allContoursWithData;
+		std::vector<ContourWithData> validContoursWithData;
+		std::vector<std::vector<cv::Point> > ptContours;        // declare contours vector
+		std::vector<cv::Vec4i> v4iHierarchy;                    // declare contours hierarchy
+		cv::Mat frameReference;
+
         //captRefrnc >> frameReference; TODO
-        frameReference = cv::imread("tail_sample2.png");
+        frameReference = cv::imread(fName);
         cv::Mat imgThresh = processFrame(frameReference, ptContours, v4iHierarchy);
 
         // Initialize allContoursWithData w/ boundingRect area
@@ -77,20 +86,18 @@ int main(int argc, char *argv[])
 		// Preparing for contour partitions
         std::vector<int> labels;
 		int r_tol = 3;
+		float h_tol = 0.25;
         
 		// Designating contour partitions via lambda filter
-		// https://stackoverflow.com/questions/33825249/opencv-euclidean-clustering-vs-findcontours/33834092#33834092
-		int n_labels = cv::partition(allContoursWithData, labels, [r_tol](const ContourWithData& lhs, const ContourWithData& rhs) {
-			// Filter out by w/h ratio
-			//float temp1 = (lhs.boundingRect.width * 1.0) / lhs.boundingRect.height;
-			//float temp2 = (rhs.boundingRect.width * 1.0)/ rhs.boundingRect.height;
-			//if (!(temp1*1.15 > temp2 && temp1*.65 < temp2)) return false;
+		int n_labels = cv::partition(allContoursWithData, labels, [r_tol,h_tol](const ContourWithData& lhs, const ContourWithData& rhs) {
+			// Filter out by hight differentials
+			if (!(std::abs(lhs.boundingRect.height - rhs.boundingRect.height) < lhs.boundingRect.height*h_tol)) return false;
 
 			// Filter out by proximity
-			if (!(lhs.boundingRect.x + lhs.boundingRect.width*2 > rhs.boundingRect.x && lhs.boundingRect.x - lhs.boundingRect.width*2 < rhs.boundingRect.x)) return false;
+			if (!(lhs.boundingRect.x + lhs.boundingRect.width*2 > rhs.boundingRect.x 
+				&& lhs.boundingRect.x - lhs.boundingRect.width*2 < rhs.boundingRect.x)) return false;
 
 			// Filter out by area
-			//return std::abs(lhs.fltArea - rhs.fltArea) < r_tol * std::abs(lhs.fltArea - rhs.fltArea);
 			if (lhs.fltArea < rhs.fltArea)
 				return rhs.fltArea < lhs.fltArea * r_tol;
 			else
@@ -100,7 +107,8 @@ int main(int argc, char *argv[])
 		// Loading contour partitions
         std::vector< std::vector<ContourWithData> > contoursPartitioned(n_labels);
         for (int i = 0; i < allContoursWithData.size(); ++i) {
-			contoursPartitioned[labels[i]].emplace_back(allContoursWithData[i]); // Formerly an error on an undefined push_back, but fixed with an emplace_back
+			// FROMERLY an ERROR on an undefined push_back, but fixed with an emplace_back
+			contoursPartitioned[labels[i]].emplace_back(allContoursWithData[i]);
         }
 
 		// Preparing to process contour partitions
@@ -124,28 +132,28 @@ int main(int argc, char *argv[])
 
 			// TODO: Check for Shapes Triangle / Trapezoid / Rectangle
 			if (scannedTextTag) {
-				/*
-				std::vector< std::vector<cv::Point> > approx;
-				approx.resize(validContoursWithData.size());
-				for (int k = 0; k < validContoursWithData.size(); k++) {
-				approxPolyDP(cv::Mat(validContoursWithData[k].ptContour), approx[k], 3, true);
-				}*/
+				//std::vector< std::vector<cv::Point> > approx;
+				//approx.resize(validContoursWithData.size());
+				//for (int k = 0; k < validContoursWithData.size(); k++) {
+				//approxPolyDP(cv::Mat(validContoursWithData[k].ptContour), approx[k], 3, true);
+				//}
 
 			}
         }
 
         // show final string & input image with green boxes drawn around found digits
-        std::cout << "\n\n" << "numbers read = " << strFinalString << "\n\n";
-        imshow(WIN_RF, frameReference); 
+        std::cout << "tag read = " << strFinalString << "\n";
+        //cv::imshow(WIN_RF, frameReference);
         char c = (char)cv::waitKey(20);
         if (c == 27) break;
     }
     return 0;
 }
 
+
 void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWithData> &_validContoursWithData, cv::Mat imgSrc, cv::Mat matThresh, std::string &_strFinalString)
 {
-	std::string validSubStrings = "UH8L6RG7CSIPJW3A2X"; // Changed 1 to I because at the moment KNN isn't too accurate 
+	std::string validSubStrings = "UH8L6RG7CS1PJW3A2X";
     for (int i = 0; i < _validContoursWithData.size(); i++) {
 		// Preventing an invalid partition from being processed
 		if (!_validContoursWithData[i].checkIfContourIsValid()) break;
@@ -174,9 +182,8 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
         _strFinalString = _strFinalString + char(int(fltCurrentChar));
     }
 
-	if (_strFinalString.empty()) return;
-
 	// Last check for a valid tag
+	if (_strFinalString.empty()) return;
 	std::size_t found = validSubStrings.find(_strFinalString);
 	if (found == std::string::npos) _strFinalString.clear();
 }
