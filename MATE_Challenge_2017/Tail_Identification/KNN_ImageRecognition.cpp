@@ -50,12 +50,13 @@ int main(int argc, char *argv[])
 
 
 	std::vector<std::string> trainingImages = {
-		"tailA_1.png", "tailA_2.png", "tailA_3.png", "tailA_4.png", "tailA_5.png",
-		"tailB_1.png", "tailB_2.png", "tailB_3.png", "tailB_4.png",
-		"tailC_1.png", "tailC_2.png", "tailC_3.png", "tailC_4.png",
-		"tailD_1.png", "tailD_2.png", "tailD_3.png", "tailD_4.png",
-		"tailE_1.png", "tailE_2.png", "tailE_3.png", "tailE_4.png",
-		"tailF_1.png", "tailF_2.png", "tailF_3.png", "tailF_4.png"
+		//"tailA_1.png", "tailA_2.png", "tailA_3.png", "tailA_4.png", "tailA_5.png",
+		//"tailB_1.png", "tailB_2.png", "tailB_3.png", "tailB_4.png",
+		//"tailC_1.png", "tailC_2.png", "tailC_3.png", "tailC_4.png",
+		"tailD_1.png",// "tailD_2.png", "tailD_3.png", "tailD_4.png",
+		//"tailE_1.png", "tailE_2.png", 
+		"tailE_3.png"//, "tailE_4.png",
+		//"tailF_1.png", "tailF_2.png", "tailF_3.png", "tailF_4.png"
 	};
 
 	/*******************Processing Frame***************************/
@@ -80,6 +81,8 @@ int main(int argc, char *argv[])
             contourWithData.boundingRect = cv::boundingRect(contourWithData.ptContour);
             contourWithData.fltArea = cv::contourArea(contourWithData.ptContour);
             //contourWithData.moment = cv::moments(ptContours[i],false);
+			// Preventing an invalid partition from being processed
+			if (!contourWithData.checkIfContourIsValid()) continue;		// Moved to reduce contours total contours and partitions
             allContoursWithData.push_back(contourWithData);
         }
 
@@ -92,11 +95,10 @@ int main(int argc, char *argv[])
 		int n_labels = cv::partition(allContoursWithData, labels, [r_tol,h_tol](const ContourWithData& lhs, const ContourWithData& rhs) {
 			// Filter out by hight differentials
 			if (!(std::abs(lhs.boundingRect.height - rhs.boundingRect.height) < lhs.boundingRect.height*h_tol)) return false;
-			/*
+
 			// Filter out by proximity
 			if (!(lhs.boundingRect.x + lhs.boundingRect.width*2 > rhs.boundingRect.x 
 				&& lhs.boundingRect.x - lhs.boundingRect.width*2 < rhs.boundingRect.x)) return false;
-				*/
 		});
 
 		// Loading contour partitions
@@ -112,8 +114,10 @@ int main(int argc, char *argv[])
 
 		// Process contour partitions
 		for (int i = 0; i < contoursPartitioned.size(); i++) {
+			if (contoursPartitioned[i].size() < 3) continue;
+
 			// Check for Grouped Contours of x3 for Lettering
-			if (contoursPartitioned[i].size() >= 3 && scannedTextTag == false) {
+			if (scannedTextTag == false) {
 				// sort contours from left to right
 				std::sort(contoursPartitioned[i].begin(), contoursPartitioned[i].end(), ContourWithData::sortByBoundingRectXPosition);
 				// Uses KNN and produces a tag inference
@@ -138,7 +142,7 @@ int main(int argc, char *argv[])
 
         // show final string & input image with green boxes drawn around found digits
         std::cout << "tag read = " << strFinalString << "\n";
-        //cv::imshow(WIN_RF, frameReference);
+        cv::imshow(WIN_RF, frameReference);
         char c = (char)cv::waitKey(20);
         if (c == 27) break;
     }
@@ -151,7 +155,7 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
 	std::string validSubStrings = "UH8L6RG7CS1PJW3A2X";
     for (int i = 0; i < _validContoursWithData.size(); i++) {
 		// Preventing an invalid partition from being processed
-		if (!_validContoursWithData[i].checkIfContourIsValid()) break;
+		//if (!_validContoursWithData[i].checkIfContourIsValid()) break; // TODO moved to init of allcontourswithdata
 
         // draw a green rect around the current char atop original image
         cv::rectangle(imgSrc, _validContoursWithData[i].boundingRect, cv::Scalar(0, 255, 0), 2);
@@ -180,6 +184,6 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
 	// Last check for a valid tag
 	if (_strFinalString.empty()) return;
 	std::size_t found = validSubStrings.find(_strFinalString);
-	if (found == std::string::npos) _strFinalString.clear();
+	if (found == std::string::npos || _strFinalString.size() != 3) _strFinalString.clear();
 }
 
