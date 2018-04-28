@@ -1,0 +1,34 @@
+OpenCV Meeting Notes:
+
+Blob Detection
+Sharpening -> When Matching Objects
+
+Note: RGB will be different underwater (i.e. extra blue in the blue channel)
+
+Currently the test pictures have light source problem
+
+To test more aggresively:
+  Add new exaggerationover the light source
+  Maybe add blue & green for testing (from the light source / post processing)
+
+Noe: If the distance away from the target is known the pixel# will be known and easier to match to training images
+
+Preferred openCV on Laptop is good because of accuracy and latency
+From RaspberryPi, then if the video feed stream is compressed (more overhead)
+
+Greyscale = is a standard scaled by specific amounts but weights might change the true colors in the image
+  For the math, check MATLab's rgb2grey
+
+Try to partition a partition
+  Original for chars
+  New for shapes
+
+_Needs_
+  ink / color / font / print surface
+
+Color Stock (i.e. macbeth chart)
+  Threshold it from outside & inside water, to fine tune for live vide feed
+
+Cameras have an effect on the true image:
+  Exposure: Auto exposure problems
+  Sharpening: May add contrast pixels at edges
