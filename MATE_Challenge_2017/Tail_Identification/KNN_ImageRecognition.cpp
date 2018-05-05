@@ -181,9 +181,53 @@ void processContours(cv::Ptr<cv::ml::KNearest> &_kNearest, std::vector<ContourWi
         _strFinalString = _strFinalString + char(int(fltCurrentChar));
     }
 
+	// Params for put text
+	std::string label;
+	cv::Point pt(14, 5); // READ ADJUST
+	cv::Scalar scal_bgr;
+
 	// Last check for a valid tag
 	if (_strFinalString.empty()) return;
 	std::size_t found = validSubStrings.find(_strFinalString);
 	if (found == std::string::npos || _strFinalString.size() != 3) _strFinalString.clear();
+	else {
+		// https://stackoverflow.com/questions/21256914/add-text-labels-in-opencv-image
+		
+		// Set Point
+		switch (found) {
+			// Red A, Triangle
+			case 0:	//scal_rgb = cv::Scalar(255, 0, 0);
+				scal_bgr = cv::Scalar(0, 0, 255);
+				label = "A";
+				break;
+			// Yellow B, Triangle
+			case 3: //scal_rgb = cv::Scalar(255, 255, 0);
+				scal_bgr = cv::Scalar(0, 255, 255);
+				label = "B";
+				break;
+			// Blue C, Triangle
+			case 6: //scal_rgb = cv::Scalar(0, 0, 255);
+				scal_bgr = cv::Scalar(255, 0, 0);
+				label = "C";
+				break;
+			// Red D, Rectangle
+			case 9: //scal_rgb = cv::Scalar(255, 0, 0);
+				scal_bgr = cv::Scalar(0, 0, 255);
+				label = "D";
+				break;
+			// Yellow E, Rectangle
+			case 12: //scal_rgb = cv::Scalar(255, 255, 0);
+				scal_bgr = cv::Scalar(0, 255, 255);
+				label = "E";
+				break;
+			// Blue F, Rectangle
+			case 15: //scal_rgb = cv::Scalar(0, 0, 255);
+				scal_bgr = cv::Scalar(255, 0, 0);
+				label = "F";
+				break;
+			}
+		// UH8L6RG7CS1PJW3A2X
+		cv::putText(imgSrc, label, pt, cv::FONT_HERSHEY_PLAIN, 1.0, scal_bgr, 2.0);
+	}
 }
 
