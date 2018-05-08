@@ -99,6 +99,8 @@ int main(int argc, char *argv[])
 			// Filter out by proximity
 			if (!(lhs.boundingRect.x + lhs.boundingRect.width*2 > rhs.boundingRect.x 
 				&& lhs.boundingRect.x - lhs.boundingRect.width*2 < rhs.boundingRect.x)) return false;
+
+			return true;
 		});
 
 		// Loading contour partitions

@@ -29,8 +29,8 @@ int main() {
   };
 
   // Added for the videofeed
-  //cv::VideoCapture captRefrnc(0); // Using the default camera
-  cv::VideoCapture captRefrnc("https://http://169.254.217.9:8080/stream"); // Referencing the videofeed
+  cv::VideoCapture captRefrnc(0); // Using the default camera
+  //cv::VideoCapture captRefrnc("https://http://169.254.217.9:8080/stream"); // Referencing the videofeed
   if (!captRefrnc.isOpened())
   {
       std::cout  << "Could not open reference video" << std::endl;
@@ -43,7 +43,7 @@ int main() {
   while(true)
   {
     //imgTrainingNumbers = cv::imread(fName);
-    captRefrnc >> imgTraingingNumbers;
+    captRefrnc >> imgTrainingNumbers;
     cv::Mat imgThresh = processFrame(imgTrainingNumbers, ptContours, v4iHierarchy);
 
     // for each contour
