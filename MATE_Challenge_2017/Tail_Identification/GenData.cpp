@@ -1,7 +1,7 @@
 // GenData.cpp
 
 #include "openCV_Lib.h"
-int main() {
+int main123() {
    cv::Mat imgTrainingNumbers;
    cv::Mat matClassificationInts;
    cv::Mat matTrainingImagesAsFlattenedFloats;
@@ -20,12 +20,12 @@ int main() {
 
   std::vector<std::string> trainingImages = {
   "tailA_1.png"//, "tailA_2.png", "tailA_3.png", "tailA_4.png",
-//		"tailB_1.png", "tailB_2.png", "tailB_3.png", "tailB_4.png",
-//		"tailC_1.png", "tailC_2.png", "tailC_3.png", "tailC_4.png",
-//		"tailD_1.png", "tailD_2.png", "tailD_3.png", "tailD_4.png",
-//		"tailE_1.png", "tailE_2.png", "tailE_3.png", "tailE_4.png",
-//		"tailF_1.png", "tailF_2.png", "tailF_3.png", "tailF_4.png",
-//		"training_chars.png"
+//    "tailB_1.png", "tailB_2.png", "tailB_3.png", "tailB_4.png",
+//    "tailC_1.png", "tailC_2.png", "tailC_3.png", "tailC_4.png",
+//    "tailD_1.png", "tailD_2.png", "tailD_3.png", "tailD_4.png",
+//    "tailE_1.png", "tailE_2.png", "tailE_3.png", "tailE_4.png",
+//    "tailF_1.png", "tailF_2.png", "tailF_3.png", "tailF_4.png",
+//    "training_chars.png"
   };
 
   // Added for the videofeed
@@ -39,11 +39,12 @@ int main() {
 
 
   // Training KNN
-//  for (auto &fName : trainingImages) // access by reference to avoid copying
+  // for (auto &fName : trainingImages) // access by reference to avoid copying
   while(true)
   {
     //imgTrainingNumbers = cv::imread(fName);
     captRefrnc >> imgTrainingNumbers;
+
     cv::Mat imgThresh = processFrame(imgTrainingNumbers, ptContours, v4iHierarchy);
 
     // for each contour
